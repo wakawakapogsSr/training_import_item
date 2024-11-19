@@ -1,4 +1,4 @@
-@extends('item.main')
+@extends('Item.main')
 
 @section('item_content')
   
