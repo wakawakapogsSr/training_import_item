@@ -49,9 +49,38 @@ return new class extends Migration
       $table->timestamps();
     });
 
-    Schema::create('transactions', function (Blueprint $table) {
+    Schema::create('item_movements', function (Blueprint $table) {
       $table->id();
+      $table->bigInteger('quantity');
+      $table->string('type', 50);
+      $table->unsignedBigInteger('item_id')->nullable();
+      $table->unsignedBigInteger('branch_id')->nullable();
       $table->timestamps();
+    });
+
+    Schema::create('costs', function (Blueprint $table) {
+      $table->id();
+      $table->bigInteger('quantity');
+      $table->bigInteger('amount');
+      $table->boolean('with_vat')->default(0);
+      $table->unsignedBigInteger('item_id')->nullable();
+      $table->timestamps();
+    });
+
+    Schema::create('locations', function (Blueprint $table) {
+      $table->id();
+      $table->string('name',191);
+      $table->boolean('is_active')->default(1);
+      $table->unsignedBigInteger('branch_id')->nullable();
+      $table->timestamps();
+    });
+
+    // pivot >>>>>>>>>>>>>>>>>>>>>>>>
+    Schema::create('item_location', function (Blueprint $table) {
+      $table->unsignedBigInteger('item_id');
+      $table->unsignedBigInteger('location_id');
+      $table->timestamps();
+      $table->primary(['item_id','location_id']);
     });
 
   }
@@ -65,7 +94,11 @@ return new class extends Migration
     Schema::dropIfExists('branches');
     Schema::dropIfExists('employees');
     Schema::dropIfExists('items');
-    Schema::dropIfExists('transactions');
+    Schema::dropIfExists('item_movements');
+    Schema::dropIfExists('costs');
+    Schema::dropIfExists('locations');
+    //pivot
+    Schema::dropIfExists('item_location');
   }
 };
 

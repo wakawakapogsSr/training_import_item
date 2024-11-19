@@ -11,7 +11,14 @@ class ItemController extends Controller
 {
   public function index()
   {
-    $items = Item::paginate(100);
+    $items = Item::with([
+        'costs' => function ($query) {
+            $query->orderBy('created_at', 'desc')->limit(1);
+        },
+        'locations' => function ($query) {
+            $query->select('locations.id','locations.name');
+        }
+      ])->paginate(100);
     return view('Item.items', compact('items'));
   }
 
@@ -24,7 +31,7 @@ class ItemController extends Controller
   {
     $request->validate(['items' => 'required|mimes:xlsx,csv']);
 
-    Excel::import(new ItemsImport, $request->file('items'));
+    Excel::import(new ItemsImport($request->branch), $request->file('items'));
 
     return redirect()->back()->with('success', 'Users imported successfully!');
   }
